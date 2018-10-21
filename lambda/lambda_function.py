@@ -4,6 +4,8 @@ import json
 import uuid
 import pymysql
 import logging
+import secrets
+import hashlib
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -49,6 +51,26 @@ def post_line(event, context):
     """.format(**body_obj)
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
+        cur.execute(query)
+
+    return {
+        "message": "Success",
+        "uuid": body_obj['id']
+    }
+
+def post_bus(event, context):
+    body_obj = json.loads(event['body'])
+    body_obj['line_id'] = event['pathParameters']['id']
+    body_obj['id'] = str(uuid.uuid4())
+    body_obj['api_key'] = 'api_' + hashlib.sha1(secrets.token_bytes(32)).hexdigest()
+
+    query = """
+        INSERT INTO bus 
+        (id, api_key, line_id, created_at) VALUES
+        ('{id}', '{api_key}', '{line_id}', UTC_TIMESTAMP());
+    """.format(**body_obj)
+
+    with conn.cursor() as cur:
         cur.execute(query)
 
     return {
