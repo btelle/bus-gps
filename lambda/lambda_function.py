@@ -52,7 +52,8 @@ def post_line(event, context):
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         cur.execute(query)
-
+    
+    conn.commit()
     return {
         "message": "Success",
         "uuid": body_obj['id']
@@ -73,6 +74,7 @@ def post_bus(event, context):
     with conn.cursor() as cur:
         cur.execute(query)
 
+    conn.commit()
     return {
         "message": "Success",
         "uuid": body_obj['id']
@@ -133,6 +135,7 @@ def post_location(event, context):
     with conn.cursor() as cur:
         cur.execute(query)
     
+    conn.commit()
     return {
         'message': 'Success',
         'uuid': body_obj['id']
