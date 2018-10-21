@@ -1,6 +1,7 @@
 import os
 import sys
-import math
+import json
+import uuid
 import pymysql
 import logging
 
@@ -63,6 +64,25 @@ def get_locations(event, context):
             ret.append(tmp)
     
     return ret
+
+def post_location(event, context):
+    body_obj = json.loads(event['body'])
+    body_obj['bus_id'] = event['pathParameters']['id']
+    body_obj['id'] = str(uuid.uuid4())
+    
+    query = """
+        INSERT INTO location 
+        (id, bus_id, latitude, longitude, direction, published_at) VALUES
+        ('{id}', '{bus_id}', {latitude}, {longitude}, '{direction}', UTC_TIMESTAMP());
+    """.format(**body_obj)
+
+    with conn.cursor() as cur:
+        cur.execute(query)
+    
+    return {
+        'message': 'Success',
+        'uuid': body_obj['id']
+    }
 
 def get_dms(decimal, type):
     tmp = {}
