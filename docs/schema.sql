@@ -74,41 +74,6 @@ CREATE TABLE IF NOT EXISTS `busgps`.`location` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
-USE `busgps` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `busgps`.`current_location`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `busgps`.`current_location` (`bus_id` INT, `latitude` INT, `longitude` INT, `direction` INT, `published_at` INT);
-
--- -----------------------------------------------------
--- View `busgps`.`current_location`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `busgps`.`current_location` ;
-DROP TABLE IF EXISTS `busgps`.`current_location`;
-USE `busgps`;
-CREATE  OR REPLACE VIEW `current_location` AS
-SELECT bus_id, latitude, longitude, direction, published_at
-FROM (
-	SELECT
-		bus.id as bus_id,
-        location.latitude as latitude,
-        location.longitude as longitude,
-        location.direction as direction,
-        location.published_at as published_at,
-        ( 
-            CASE bus.id 
-            WHEN @curType 
-            THEN @curRow := @curRow + 1 
-            ELSE @curRow := 1 AND @curType := bus.id END
-          ) + 1 as rownum
-	FROM bus INNER JOIN location ON bus.id=location.bus_id,
-    (SELECT @curRow := 0, @curType := '')
-    ORDER BY bus.id, location.published_at DESC
-)
-WHERE rownum=1;
-
-
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
