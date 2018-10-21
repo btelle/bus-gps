@@ -24,6 +24,38 @@ except:
     logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
     sys.exit()
 
+def get_lines(event, context):
+    with conn.cursor(pymysql.cursors.DictCursor) as cur:
+        cur.execute("SELECT * FROM line;")
+        
+        ret = []
+        for row in cur.fetchall():
+            tmp = {}
+            tmp['id'] = row['id']
+            tmp['title'] = row['title']
+
+            ret.append(tmp)
+        
+        return ret
+
+def post_line(event, context):
+    body_obj = json.loads(event['body'])
+    body_obj['id'] = str(uuid.uuid4())
+
+    query = """
+        INSERT INTO line 
+        (id, title, direction_1, direction_2) VALUES
+        ('{id}', '{title}', '{direction_1}', '{direction_2}');
+    """.format(**body_obj)
+
+    with conn.cursor(pymysql.cursors.DictCursor) as cur:
+        cur.execute(query)
+
+    return {
+        "message": "Success",
+        "uuid": body_obj['id']
+    }
+
 def get_locations(event, context):
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         cur.execute("""
