@@ -54,6 +54,7 @@ def post_line(event, context):
         cur.execute(query)
     
     conn.commit()
+    conn.close()
     return {
         "message": "Success",
         "uuid": body_obj['id']
@@ -75,6 +76,7 @@ def post_bus(event, context):
         cur.execute(query)
 
     conn.commit()
+    conn.close()
     return {
         "message": "Success",
         "uuid": body_obj['id']
@@ -96,7 +98,7 @@ def get_locations(event, context):
                     CASE bus.id 
                     WHEN @curType 
                     THEN @curRow := @curRow + 1 
-                    ELSE @curRow := 1 AND @curType := bus.id END
+                    ELSE @curRow := 0 AND @curType := bus.id END
                 ) + 1 as rownum
             FROM bus INNER JOIN location ON bus.id=location.bus_id INNER JOIN line ON bus.line_id=line.id,
             (SELECT @curRow := 0, @curType := '') as t
@@ -136,6 +138,7 @@ def post_location(event, context):
         cur.execute(query)
     
     conn.commit()
+    conn.close()
     return {
         'message': 'Success',
         'uuid': body_obj['id']
