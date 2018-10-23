@@ -61,7 +61,7 @@ def post_line(event, context):
     }
 
 def post_bus(event, context):
-    body_obj = json.loads(event['body'])
+    body_obj = {}
     body_obj['line_id'] = event['pathParameters']['id']
     body_obj['id'] = str(uuid.uuid4())
     body_obj['api_key'] = 'api_' + hashlib.sha1(secrets.token_bytes(32)).hexdigest()
@@ -78,8 +78,12 @@ def post_bus(event, context):
     conn.commit()
     conn.close()
     return {
-        "message": "Success",
-        "uuid": body_obj['id']
+        'statusCode': 200,
+        'isBase64Encoded': False,
+        'body': json.dumps({
+            "message": "Success",
+            "uuid": body_obj['id']
+        })
     }
 
 def get_locations(event, context):
@@ -140,8 +144,12 @@ def post_location(event, context):
     conn.commit()
     conn.close()
     return {
-        'message': 'Success',
-        'uuid': body_obj['id']
+        'statusCode': 200,
+        'isBase64Encoded': False,
+        'body': json.dumps({
+            "message": "Success",
+            "uuid": body_obj['id']
+        })
     }
 
 def get_dms(decimal, type):
