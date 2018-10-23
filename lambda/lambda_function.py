@@ -19,14 +19,15 @@ except KeyError:
     logger.error('ERROR: Environment variables not set')
     sys.exit()
 
-try:
-    conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
-except:
-    raise
-    logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
-    sys.exit()
 
 def get_lines(event, context):
+    try:
+        conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
+    except:
+        raise
+        logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
+        sys.exit()
+
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         cur.execute("SELECT * FROM line;")
         
@@ -41,6 +42,13 @@ def get_lines(event, context):
         return ret
 
 def post_line(event, context):
+    try:
+        conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
+    except:
+        raise
+        logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
+        sys.exit()
+    
     body_obj = json.loads(event['body'])
     body_obj['id'] = str(uuid.uuid4())
 
@@ -56,11 +64,22 @@ def post_line(event, context):
     conn.commit()
     conn.close()
     return {
-        "message": "Success",
-        "uuid": body_obj['id']
+        'statusCode': 200,
+        'isBase64Encoded': False,
+        'body': json.dumps({
+            "message": "Success",
+            "uuid": body_obj['id']
+        })
     }
 
 def post_bus(event, context):
+    try:
+        conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
+    except:
+        raise
+        logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
+        sys.exit()
+    
     body_obj = {}
     body_obj['line_id'] = event['pathParameters']['id']
     body_obj['id'] = str(uuid.uuid4())
@@ -87,6 +106,13 @@ def post_bus(event, context):
     }
 
 def get_locations(event, context):
+    try:
+        conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
+    except:
+        raise
+        logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
+        sys.exit()
+
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         cur.execute("""
         SELECT bus_id, line_title, latitude, longitude, direction, published_at
@@ -128,6 +154,13 @@ def get_locations(event, context):
     return ret
 
 def post_location(event, context):
+    try:
+        conn = pymysql.connect(rds_host, user=user, passwd=password, db=db_name, connect_timeout=5)
+    except:
+        raise
+        logger.error("ERROR: Unexpected error: Could not connect to MySql instance.")
+        sys.exit()
+    
     body_obj = json.loads(event['body'])
     body_obj['bus_id'] = event['pathParameters']['id']
     body_obj['id'] = str(uuid.uuid4())
