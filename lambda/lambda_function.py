@@ -115,26 +115,12 @@ def get_locations(event, context):
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         cur.execute("""
-        SELECT bus_id, line_title, latitude, longitude, direction, published_at
-        FROM (
             SELECT
                 bus.id as bus_id,
-                line.title as line_title,
-                location.latitude as latitude,
-                location.longitude as longitude,
-                location.direction as direction,
-                location.published_at as published_at,
-                ( 
-                    CASE bus.id 
-                    WHEN @curType 
-                    THEN @curRow := @curRow + 1 
-                    ELSE @curRow := 0 AND @curType := bus.id END
-                ) + 1 as rownum
-            FROM bus INNER JOIN location ON bus.id=location.bus_id INNER JOIN line ON bus.line_id=line.id,
-            (SELECT @curRow := 0, @curType := '') as t
-            ORDER BY bus.id, location.published_at DESC
-        ) as r
-        WHERE rownum=1;
+                line.title as line_title
+            FROM bus INNER JOIN line ON bus.line_id=line.id LEFT JOIN location ON bus.id=location.bus_id
+            WHERE location.id IS NOT NULL
+            GROUP BY 1,2;
         """)
 
         ret = []
@@ -142,12 +128,28 @@ def get_locations(event, context):
             tmp = {'gps': {'latitude': {}, 'longitude': {}}, 'bus': {}}
             tmp['bus']['id'] = row['bus_id']
             tmp['bus']['line'] = row['line_title']
-            tmp['gps']['latitude']['decimal'] = row['latitude']
-            tmp['gps']['latitude']['dms'] = get_dms(row['latitude'], 'latitude')
-            tmp['gps']['longitude']['decimal'] = row['longitude']
-            tmp['gps']['longitude']['dms'] = get_dms(row['longitude'], 'longitude')
-            tmp['direction'] = row['direction']
-            tmp['published_at'] = row['published_at'].isoformat() + 'Z'
+            
+            query = """
+                SELECT
+                    latitude,
+                    longitude,
+                    direction,
+                    published_at
+                FROM location
+                WHERE location.bus_id='{bus_id}'
+                ORDER BY published_at DESC
+                LIMIT 1;
+            """.format(bus_id=row['bus_id'])
+            
+            cur.execute(query)
+            loc_row = cur.fetchone();
+            
+            tmp['gps']['latitude']['decimal'] = loc_row['latitude']
+            tmp['gps']['latitude']['dms'] = get_dms(loc_row['latitude'], 'latitude')
+            tmp['gps']['longitude']['decimal'] = loc_row['longitude']
+            tmp['gps']['longitude']['dms'] = get_dms(loc_row['longitude'], 'longitude')
+            tmp['direction'] = loc_row['direction']
+            tmp['published_at'] = loc_row['published_at'].isoformat() + 'Z'
 
             ret.append(tmp)
     
