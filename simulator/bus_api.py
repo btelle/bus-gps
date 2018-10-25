@@ -34,6 +34,18 @@ def get_lines():
         raise ApiException(resp.text)
 
 
+def get_locations():
+    """ Get a list of bus lines. """
+
+    resp = requests.get(api_url + '/locations')
+
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        logger.error(resp.text)
+        raise ApiException(resp.text)
+
+
 def post_line(title, direction_1, direction_2):
     """ Create a bus line. """
 
@@ -51,3 +63,30 @@ def post_line(title, direction_1, direction_2):
         logger.error(resp.text)
         raise ApiException(resp.text)
 
+
+def post_bus(line_id):
+    """ Create a bus. """
+    resp = requests.post(api_url + '/lines/' + line_id + '/bus')
+
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        logger.error(resp.text)
+        raise ApiException(resp.text)
+
+
+def post_location(bus_id, latitude, longitude, direction):
+    """ Update the bus's location. """
+    body = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'direction': direction
+    }
+
+    resp = requests.post(api_url + '/bus/' + bus_id + '/location', json=body)
+
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        logger.error(resp.text)
+        raise ApiException(resp.text)
