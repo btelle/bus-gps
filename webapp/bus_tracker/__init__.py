@@ -32,10 +32,10 @@ def index():
 	return render_template(
 		'index.html',
 		title="bus tracker",
-		line_id="602a028f-48cb-4fdc-a3d6-e557c53fded9",
+		line_id='all',
 		start={
-			"lat": 34.219,
-			"long": -118.642
+			"lat": 34.171729,
+			"long": -118.340092
 		}
 	)
 
@@ -43,15 +43,26 @@ def index():
 def api_get_locations(id):
 	cursor = get_db().cursor()
 
-	query = """
+	if id == 'all':
+		query = """
 		SELECT
 			bus.id as bus_id,
 			line.title as line_title,
 			line.color as line_color
 		FROM bus INNER JOIN line ON bus.line_id=line.id LEFT JOIN location ON bus.id=location.bus_id
-		WHERE location.id IS NOT NULL AND line.id='{}'
+		WHERE location.id IS NOT NULL
 		GROUP BY 1,2;
-	""".format(id)
+	"""
+	else:
+		query = """
+			SELECT
+				bus.id as bus_id,
+				line.title as line_title,
+				line.color as line_color
+			FROM bus INNER JOIN line ON bus.line_id=line.id LEFT JOIN location ON bus.id=location.bus_id
+			WHERE location.id IS NOT NULL AND line.id='{}'
+			GROUP BY 1,2;
+		""".format(id)
 
 	cursor.execute(query)
 

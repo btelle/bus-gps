@@ -34,7 +34,7 @@ var tracker = {
                         tracker.map.removeLayer(tracker.map_markers[bus.id]);
                     }
                     
-                    var icon = L.MakiMarkers.icon({icon: "bus", color: "#f90", size: "m"});
+                    var icon = L.MakiMarkers.icon({icon: "bus", color: bus.color, size: "m"});
                     tracker.map_markers[bus.id] = L.marker([
                         parseFloat(bus.location.latitude),
                         parseFloat(bus.location.longitude)
@@ -50,6 +50,7 @@ var tracker = {
     },
     format_popup: function(bus) {
         html = "<b>Bus " + bus.id + "</b><br />";
+        html += "Line: <code>" + bus.line + "</code><br />";
         html += "Latitude: <code>" + bus.location.latitude.toString() + "</code><br />";
         html += "Longitude: <code>" + bus.location.longitude.toString() + "</code><br />";
         html += "Direction: <code>" + bus.direction + "</code><br />";
