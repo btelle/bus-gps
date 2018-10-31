@@ -21,6 +21,8 @@ var tracker = {
         }).addTo(tracker.map);
 
         L.MakiMarkers.accessToken = tracker.mapbox_token;
+        
+        tracker.update_locations();
         setInterval(tracker.update_locations, 5000);
     },
     update_locations: function() {
