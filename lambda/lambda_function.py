@@ -54,8 +54,8 @@ def post_line(event, context):
 
     query = """
         INSERT INTO line 
-        (id, title, direction_1, direction_2) VALUES
-        ('{id}', '{title}', '{direction_1}', '{direction_2}');
+        (id, title, color, direction_1, direction_2) VALUES
+        ('{id}', '{title}', '{color}', '{direction_1}', '{direction_2}');
     """.format(**body_obj)
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:

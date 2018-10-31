@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS `busgps`.`line` ;
 CREATE TABLE IF NOT EXISTS `busgps`.`line` (
   `id` VARCHAR(60) NOT NULL COMMENT '',
   `title` VARCHAR(255) NOT NULL COMMENT '',
+  `color` VARCHAR(50) NULL COMMENT '',
   `direction_1` VARCHAR(50) NOT NULL COMMENT '',
   `direction_2` VARCHAR(50) NOT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '')

@@ -46,7 +46,8 @@ def api_get_locations(id):
 	query = """
 		SELECT
 			bus.id as bus_id,
-			line.title as line_title
+			line.title as line_title,
+			line.color as line_color
 		FROM bus INNER JOIN line ON bus.line_id=line.id LEFT JOIN location ON bus.id=location.bus_id
 		WHERE location.id IS NOT NULL AND line.id='{}'
 		GROUP BY 1,2;
@@ -59,6 +60,7 @@ def api_get_locations(id):
 		tmp = {'location': {}}
 		tmp['id'] = row['bus_id']
 		tmp['line'] = row['line_title']
+		tmp['color'] = row['line_color']
 		
 		query = """
 			SELECT

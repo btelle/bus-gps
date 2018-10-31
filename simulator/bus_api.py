@@ -46,11 +46,12 @@ def get_locations():
         raise ApiException(resp.text)
 
 
-def post_line(title, direction_1, direction_2):
+def post_line(title, color, direction_1, direction_2):
     """ Create a bus line. """
 
     body = {
         'title': title,
+        'color': color,
         'direction_1': direction_1,
         'direction_2': direction_2
     }
